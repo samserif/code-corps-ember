@@ -93,7 +93,7 @@
     "ember-watson": "0.8.5",
     "emberx-select": "3.0.0",
     "eslint-plugin-ember-suave": "^1.0.0",
-    "loader.js": "^4.0.10",
+    "loader.js": "^4.2.2",
     "normalize.css": "^4.1.1"
   },
   "dependencies": {
