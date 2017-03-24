@@ -221,11 +221,11 @@ export default Route.extend(ApplicationRouteMixin, LoadingBar, {
   _shouldTransitionToOnboardingRoute(transition) {
     let isOnboarding = get(this, 'isOnboarding');
 
-    let onboardingRoutes = get(this, 'onboarding.routes');
+    let allowedRoutes = get(this, 'onboarding.allowedRoutes');
     let targetRoute = transition.targetName;
-    let isTransitionToOnboardingRoute = (onboardingRoutes.indexOf(targetRoute) > -1);
+    let isTransitionToAllowedRoute = (allowedRoutes.indexOf(targetRoute) > -1);
 
-    return isOnboarding && !isTransitionToOnboardingRoute;
+    return isOnboarding && !isTransitionToAllowedRoute;
   },
 
   _trackAuthentication() {

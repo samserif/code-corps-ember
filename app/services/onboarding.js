@@ -2,6 +2,7 @@ import Ember from 'ember';
 
 const {
   computed,
+  get,
   inject: { service },
   Service
 } = Ember;
@@ -14,6 +15,13 @@ export default Service.extend({
     {
       number: 1,
       state: 'signed_up',
+      currentRoute: 'start.hello',
+      nextRoute: 'start.interests',
+      nextStateTransition: 'edit_profile'
+    },
+    {
+      number: 1,
+      state: 'signed_up_donating',
       currentRoute: 'start.hello',
       nextRoute: 'start.interests',
       nextStateTransition: 'edit_profile'
@@ -42,26 +50,37 @@ export default Service.extend({
   ],
 
   _currentStep: computed('currentUser.user.state', function() {
-    let state = this.get('currentUser.user.state');
-    let steps = this.get('_steps');
+    let state = get(this, 'currentUser.user.state');
+    let steps = get(this, '_steps');
     return steps.find((step) => {
       return step.state === state;
     });
   }),
 
+  _allowedRoutes: [
+    'project.checkout',
+    'project.donate',
+    'project.thank-you',
+    'terms',
+    'privacy'
+  ],
+
+  allowedRoutes: computed.union('_allowedRoutes', 'onboardingRoutes'),
   currentRoute: computed.alias('_currentStep.currentRoute'),
   currentStepNumber: computed.alias('_currentStep.number'),
   currentStepState: computed.alias('_currentStep.state'),
-  isEditingProfile: computed.equal('currentStepState', 'signed_up'),
+  isEditingProfile: computed.or('stateIsSignedUp', 'stateIsSignedUpDonating'),
   isOnboarding: computed.or('isEditingProfile', 'isSelectingCategories', 'isSelectingRoles', 'isSelectingSkills'),
   isSelectingCategories: computed.equal('currentStepState', 'edited_profile'),
   isSelectingRoles: computed.equal('currentStepState', 'selected_categories'),
   isSelectingSkills: computed.equal('currentStepState', 'selected_roles'),
   nextRoute: computed.alias('_currentStep.nextRoute'),
   nextStateTransition: computed.alias('_currentStep.nextStateTransition'),
-  routes: computed.mapBy('_steps', 'currentRoute'),
+  onboardingRoutes: computed.mapBy('_steps', 'currentRoute'),
+  stateIsSignedUp: computed.equal('currentStepState', 'signed_up'),
+  stateIsSignedUpDonating: computed.equal('currentStepState', 'signed_up_donating'),
 
   progressPercentage: computed('currentStepNumber', 'totalSteps', function() {
-    return (this.get('currentStepNumber') / this.get('totalSteps')) * 100;
+    return (get(this, 'currentStepNumber') / get(this, 'totalSteps')) * 100;
   })
 });
