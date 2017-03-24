@@ -3,11 +3,14 @@ import Ember from 'ember';
 const {
   computed,
   Controller,
-  inject: { service }
+  get,
+  inject: { service },
+  observer
 } = Ember;
 
 export default Controller.extend({
   codeTheme: service(),
+  currentRoute: service(),
   onboarding: service(),
   projectTaskBoard: service(),
   session: service(),
@@ -19,6 +22,10 @@ export default Controller.extend({
 
   shouldShowFooter: computed.and('isNotOnboarding', 'isNotViewingProjectTaskBoard'),
   shouldShowSpacer: computed.alias('isNotViewingProjectTaskBoard'),
+
+  _updateRoute: observer('currentRouteName', function() {
+    get(this, 'currentRoute').didTransition();
+  }),
 
   actions: {
     invalidateSession() {

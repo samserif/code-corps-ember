@@ -10,7 +10,9 @@
 
   {{#if navigationMenu.isOnboarding}}
     <div class="header-navigation--left">
-      <div class="onboarding__steps">Step {{onboarding.currentStepNumber}} of {{onboarding.totalSteps}}</div>
+      {{#if navigationMenu.onOnboardingRoute}}
+        <div class="onboarding__steps">Step {{onboarding.currentStepNumber}} of {{onboarding.totalSteps}}</div>
+      {{/if}}
     </div>
   {{/if}}
 
@@ -37,9 +39,17 @@
 
   {{#if navigationMenu.isOnboarding}}
     <div class="header-navigation--onboarding header-navigation--right">
-      <div class="onboarding__progress">
-        {{progress-bar-container percentage=onboarding.progressPercentage}}
-      </div>
+      {{#if navigationMenu.onOnboardingRoute}}
+        <div class="onboarding__progress">
+          {{progress-bar-container percentage=onboarding.progressPercentage}}
+        </div>
+      {{/if}}
+
+      {{#if (eq navigationMenu.currentRoute "project.thank-you")}}
+        <div class="onboarding__continue">
+          {{link-to "Finish signing up" "start.hello" class="button default"}}
+        </div>
+      {{/if}}
     </div>
   {{/if}}
 </div>

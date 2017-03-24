@@ -153,19 +153,22 @@ export default Route.extend(ApplicationRouteMixin, LoadingBar, {
   ],
 
   beforeModel(transition) {
-    return this._loadCurrentUser().then(() => {
-      if (this._shouldTransitionToOnboardingRoute(transition)) {
-        return this.transitionTo(get(this, 'onboardingRoute'));
-      } else {
-        return this._super(...arguments);
-      }
-    }).catch(() => this._invalidateSession());
+    return this._loadCurrentUser()
+      .then(() => {
+        if (this._shouldTransitionToOnboardingRoute(transition)) {
+          console.log(get(this, 'onboardingRoute'));
+          return this.transitionTo(get(this, 'onboardingRoute'));
+        } else {
+          return this._super(...arguments);
+        }
+      })
+      .catch(() => this._invalidateSession());
   },
 
   sessionAuthenticated() {
     return this._loadCurrentUser()
       .then(() => {
-        this._attemptTransition();
+        this._attemptTransitionAfterAuthentication();
         this._trackAuthentication();
       })
       .catch(() => this._invalidateSession());
@@ -180,8 +183,8 @@ export default Route.extend(ApplicationRouteMixin, LoadingBar, {
 
     // see https://github.com/emberjs/ember.js/issues/12791
     // if we don't handle the error action at application level
-    // te error will continue to be thrown, causing tests to fail
-    // and the error to be outputed to console, even though we technically
+    // the error will continue to be thrown, causing tests to fail
+    // and the error will output to console, even though we technically
     // "handled" it with our application_error route/template
     error(e) {
       console.error(e);
@@ -196,17 +199,15 @@ export default Route.extend(ApplicationRouteMixin, LoadingBar, {
     }
   },
 
-  _attemptTransition() {
-    if (get(this, 'isOnboarding')) {
+  _attemptTransitionAfterAuthentication() {
+    let attemptedTransition = get(this, 'session.attemptedTransition');
+    if (isPresent(attemptedTransition)) {
+      attemptedTransition.retry();
+      set(this, 'session.attemptedTransition', null);
+    } else if (get(this, 'isOnboarding')) {
       this.transitionTo(get(this, 'onboardingRoute'));
     } else {
-      let attemptedTransition = get(this, 'session.attemptedTransition');
-      if (isPresent(attemptedTransition)) {
-        attemptedTransition.retry();
-        set(this, 'session.attemptedTransition', null);
-      } else {
-        this.transitionTo('projects-list');
-      }
+      this.transitionTo('projects-list');
     }
   },
 
@@ -220,7 +221,6 @@ export default Route.extend(ApplicationRouteMixin, LoadingBar, {
 
   _shouldTransitionToOnboardingRoute(transition) {
     let isOnboarding = get(this, 'isOnboarding');
-
     let allowedRoutes = get(this, 'onboarding.allowedRoutes');
     let targetRoute = transition.targetName;
     let isTransitionToAllowedRoute = (allowedRoutes.indexOf(targetRoute) > -1);

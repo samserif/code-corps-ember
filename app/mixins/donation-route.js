@@ -16,7 +16,11 @@ export default Mixin.create({
       get(this, 'flashMessages').success(ALREADY_A_SUBSCRIBER);
       this.transitionTo('project', project);
     } else {
-      this._super.call(...arguments);
+      this._super(...arguments);
     }
+  },
+
+  setupController(controller, models) {
+    controller.setProperties(models);
   }
 });

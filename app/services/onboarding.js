@@ -20,13 +20,6 @@ export default Service.extend({
       nextStateTransition: 'edit_profile'
     },
     {
-      number: 1,
-      state: 'signed_up_donating',
-      currentRoute: 'start.hello',
-      nextRoute: 'start.interests',
-      nextStateTransition: 'edit_profile'
-    },
-    {
       number: 2,
       state: 'edited_profile',
       currentRoute: 'start.interests',
@@ -69,16 +62,14 @@ export default Service.extend({
   currentRoute: computed.alias('_currentStep.currentRoute'),
   currentStepNumber: computed.alias('_currentStep.number'),
   currentStepState: computed.alias('_currentStep.state'),
-  isEditingProfile: computed.or('stateIsSignedUp', 'stateIsSignedUpDonating'),
-  isOnboarding: computed.or('isEditingProfile', 'isSelectingCategories', 'isSelectingRoles', 'isSelectingSkills'),
-  isSelectingCategories: computed.equal('currentStepState', 'edited_profile'),
-  isSelectingRoles: computed.equal('currentStepState', 'selected_categories'),
-  isSelectingSkills: computed.equal('currentStepState', 'selected_roles'),
+  isOnboarding: computed.or('shouldEditProfile', 'shouldSelectCategories', 'shouldSelectRoles', 'shouldSelectSkills'),
   nextRoute: computed.alias('_currentStep.nextRoute'),
   nextStateTransition: computed.alias('_currentStep.nextStateTransition'),
   onboardingRoutes: computed.mapBy('_steps', 'currentRoute'),
-  stateIsSignedUp: computed.equal('currentStepState', 'signed_up'),
-  stateIsSignedUpDonating: computed.equal('currentStepState', 'signed_up_donating'),
+  shouldEditProfile: computed.equal('currentStepState', 'signed_up'),
+  shouldSelectCategories: computed.equal('currentStepState', 'edited_profile'),
+  shouldSelectRoles: computed.equal('currentStepState', 'selected_categories'),
+  shouldSelectSkills: computed.equal('currentStepState', 'selected_roles'),
 
   progressPercentage: computed('currentStepNumber', 'totalSteps', function() {
     return (get(this, 'currentStepNumber') / get(this, 'totalSteps')) * 100;

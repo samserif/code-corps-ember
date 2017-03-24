@@ -23,7 +23,7 @@ export default Route.extend(UnauthenticatedRouteMixin, {
    * state, instead of the default 'signing_up'.
    */
   model({ donate }) {
-    let user = donate ? { state: 'signed_up_donating' } : {};
+    let user = donate ? { signUpContext: 'donation' } : {};
     return get(this, 'store').createRecord('user', user);
   },
 

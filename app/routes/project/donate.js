@@ -1,14 +1,17 @@
 import Ember from 'ember';
-import DonationRouteMixin from 'code-corps-ember/mixins/donation-route';
 
 const {
   get,
   inject: { service },
   Route,
-  RSVP
+  RSVP,
+  set
 } = Ember;
 
-export default Route.extend(DonationRouteMixin, {
+const ALREADY_A_SUBSCRIBER = "You're already supporting this project.";
+
+export default Route.extend({
+  flashMessages: service(),
   session: service(),
   userSubscriptions: service(),
 
@@ -21,6 +24,19 @@ export default Route.extend(DonationRouteMixin, {
         return RSVP.hash({ project, subscription: null });
       }
     });
+  },
+
+  afterModel({ project, subscription }) {
+    if (subscription) {
+      get(this, 'flashMessages').success(ALREADY_A_SUBSCRIBER);
+      this.transitionTo('project', project);
+    } else {
+      this._super(...arguments);
+    }
+  },
+
+  setupController(controller, models) {
+    controller.setProperties(models);
   },
 
   renderTemplate() {
